@@ -1,0 +1,234 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DiasSemana {
+  DOMINGO
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+}
+
+enum SituacaoAtendimento {
+  FINALIZADO
+  AGUARDANDO
+  CANCELADO
+}
+
+enum StatusPagamento {
+  PENDENTE
+  QUITADO
+}
+
+enum TipoCliente {
+  PF
+  PJ
+}
+
+enum TipoUsuario {
+  BARBEIRO
+  CLIENTE
+  ADMIN
+}
+
+model Usuario {
+  id       Int         @id @default(autoincrement())
+  nome     String
+  cpf      String      @unique
+  telefone String
+  email    String
+  tipo     TipoUsuario
+
+  cliente  Cliente?
+  admin    Administrador?
+  barbeiro Barbeiro?
+
+  @@index([cpf])
+  @@index([telefone])
+}
+
+model Cliente {
+  usuarioId             Int                    @id
+  usuario               Usuario                @relation(fields: [usuarioId], references: [id])
+  tipo                  TipoCliente
+  agendamentos          Agendamento[]
+  logStatusAtendimentos LogStatusAtendimento[]
+}
+
+model Matricula {
+  id       Int            @id @default(autoincrement())
+  admin    Administrador?
+  barbeiro Barbeiro?
+}
+
+model Administrador {
+  usuarioId             Int                    @id
+  matriculaId           Int                    @unique
+  logStatusAtendimentos LogStatusAtendimento[]
+
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
+  matricula Matricula @relation(fields: [matriculaId], references: [id])
+}
+
+model Barbeiro {
+  usuarioId             Int                    @id
+  matriculaId           Int                    @unique
+  servicos              BarbeiroServico[]
+  agendamentos          Agendamento[]
+  agenda                AgendaBarbeiro[]
+  logStatusAtendimentos LogStatusAtendimento[]
+
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
+  matricula Matricula @relation(fields: [matriculaId], references: [id])
+}
+
+model AgendaBarbeiro {
+  id               Int        @default(autoincrement())
+  barbeiroId       Int
+  dia              DiasSemana
+  abertura         String
+  intervaloSaida   String
+  intervaloRetorno String
+  encerramento     String
+
+  barbeiro Barbeiro @relation(fields: [barbeiroId], references: [usuarioId])
+
+  @@id([id, barbeiroId])
+  @@index([dia, barbeiroId])
+}
+
+model Barbearia {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  telefone   String
+  cnpj       String   @unique
+  endereco   Endereco @relation(fields: [enderecoId], references: [id])
+  enderecoId Int      @unique
+
+  @@index([cnpj])
+  @@index([nome])
+}
+
+model Servico {
+  id                  Int                  @id @default(autoincrement())
+  nome                String
+  preco               Decimal
+  mediaDuracao        String
+  barbeiros           BarbeiroServico[]
+  agendamentoServicos AgendamentoServico[]
+}
+
+model BarbeiroServico {
+  barbeiroId Int
+  servicoId  Int
+
+  barbeiro Barbeiro @relation(fields: [barbeiroId], references: [usuarioId])
+  servico  Servico  @relation(fields: [servicoId], references: [id])
+
+  @@id([barbeiroId, servicoId])
+}
+
+model Agendamento {
+  id                  Int                  @id @default(autoincrement())
+  clienteId           Int
+  barbeiroId          Int
+  horario             DateTime
+  agendamentoServicos AgendamentoServico[]
+
+  atendimentoId Int         @unique
+  atendimento   Atendimento @relation(fields: [atendimentoId], references: [id])
+
+  cliente  Cliente  @relation(fields: [clienteId], references: [usuarioId])
+  barbeiro Barbeiro @relation(fields: [barbeiroId], references: [usuarioId])
+}
+
+model AgendamentoServico {
+  agendamentoId Int
+  servicoId     Int
+
+  agendamento Agendamento @relation(fields: [agendamentoId], references: [id])
+  servico     Servico     @relation(fields: [servicoId], references: [id])
+
+  @@id([agendamentoId, servicoId])
+}
+
+model Atendimento {
+  id          Int                @id @default(autoincrement())
+  precoTotal  Decimal
+  agendamento Agendamento?
+  status      StatusAtendimento?
+}
+
+model StatusAtendimento {
+  id              Int                    @id @default(autoincrement())
+  atendimentoId   Int                    @unique
+  observacao      String
+  status          SituacaoAtendimento
+  statusPagamento StatusPagamento
+  logAlteracoes   LogStatusAtendimento[]
+
+  atendimento Atendimento @relation(fields: [atendimentoId], references: [id])
+
+  @@index([atendimentoId])
+}
+
+model LogStatusAtendimento {
+  id                  Int      @id @default(autoincrement())
+  statusAtendimentoId Int
+  ultimaAtualizacao   DateTime
+  alteradoPor         Int
+
+  statusAtendimento StatusAtendimento @relation(fields: [statusAtendimentoId], references: [id])
+
+  alteradoPorCliente Cliente? @relation(fields: [alteradoPor], references: [usuarioId], map: "fk_log_status_cliente")
+
+  alteradoPorBarbeiro Barbeiro? @relation(fields: [alteradoPor], references: [usuarioId], map: "fk_log_status_barbeiro")
+
+  alteradoPorAdmin Administrador? @relation(fields: [alteradoPor], references: [usuarioId], map: "fk_log_status_admin")
+
+  @@index([alteradoPor])
+  @@index([statusAtendimentoId])
+}
+
+model Endereco {
+  id         Int    @id @default(autoincrement())
+  logradouro String
+  numero     String
+  bairro     String
+  cep        String
+
+  cidade   Cidade @relation(fields: [cidadeId], references: [id])
+  cidadeId Int    @unique
+
+  barbearia Barbearia?
+
+  @@index([cep])
+}
+
+model Cidade {
+  id   Int    @id @default(autoincrement())
+  nome String
+
+  estado   Estado @relation(fields: [estadoId], references: [id])
+  estadoId Int    @unique
+
+  enderecos Endereco[]
+}
+
+model Estado {
+  id    Int    @id @default(autoincrement())
+  nome  String
+  sigla String
+
+  cidades Cidade[]
+
+  @@index([sigla])
+}
