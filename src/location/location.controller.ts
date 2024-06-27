@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { LocationService } from './location.service';
-import { CreateLocationDto } from './dto/create-location.dto';
-import { UpdateLocationDto } from './dto/update-location.dto';
+import { CreateCity } from './dto/create-city.dto';
 
-@Controller('location')
+@Controller('')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
-  @Post()
-  create(@Body() createLocationDto: CreateLocationDto) {
-    return this.locationService.create(createLocationDto);
+  @Post('cidade')
+  createCity(@Body() body: CreateCity) {
+    return this.locationService.createCity(body);
   }
 
   @Get()
@@ -23,8 +30,8 @@ export class LocationController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLocationDto: UpdateLocationDto) {
-    return this.locationService.update(+id, updateLocationDto);
+  update(@Param('id') id: string) {
+    return this.locationService.update(+id);
   }
 
   @Delete(':id')

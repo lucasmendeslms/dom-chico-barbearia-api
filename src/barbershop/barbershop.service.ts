@@ -1,14 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { LocationService } from 'src/location/location.service';
 // import { UpdateBarbershopDto } from './dto/update-barbershop.dto';
-import { BarbershopRepository } from './repository/barbershopRepository';
+import { BarbershopRepository } from './repositories/barbershopRepository';
 import { CreateBarbershopDto } from './dto/create-barbershop.dto';
 
 @Injectable()
 export class BarbershopService {
-  constructor(private barbershopRepository: BarbershopRepository) {}
+  constructor(
+    private barbershopRepository: BarbershopRepository,
+    private locationService: LocationService,
+  ) {}
 
   async create(barbershopData: CreateBarbershopDto): Promise<void> {
-    await this.barbershopRepository.create(barbershopData);
+    const { name, phone, cnpj, address } = barbershopData;
+
+    const addressId: number = await this.locationService.createAddress(address);
+
+    await this.barbershopRepository.create({ name, phone, cnpj, addressId });
   }
 
   findAll() {
