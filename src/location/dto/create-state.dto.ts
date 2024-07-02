@@ -6,5 +6,5 @@ export class CreateState {
 
   @Length(2)
   @IsString()
-  stateAcronym: string;
+  abbreviation: string;
 }

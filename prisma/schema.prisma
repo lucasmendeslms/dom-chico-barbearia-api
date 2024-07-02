@@ -234,9 +234,8 @@ model City {
 model State {
   id           Int    @id @default(autoincrement())
   name         String
-  stateAcronym String @unique @db.Char(2)
+  abbreviation String @unique @db.Char(2)
+  cities       City[]
 
-  cities City[]
-
-  @@index([stateAcronym])
+  @@index([abbreviation])
 }

@@ -9,12 +9,12 @@ export class PrismaStateRepository implements StateRepository {
   constructor(private prisma: PrismaService) {}
 
   async createState(stateData: State): Promise<number> {
-    const { name, stateAcronym } = stateData;
+    const { name, abbreviation } = stateData;
 
     const newState: State = await this.prisma.state.create({
       data: {
         name,
-        stateAcronym,
+        abbreviation,
       },
     });
 

@@ -48,43 +48,43 @@ export class LocationService implements OnModuleInit {
   }
 
   async createState(stateData: CreateState): Promise<number> {
-    const { name, stateAcronym } = stateData;
+    const { name, abbreviation } = stateData;
 
     return await this.stateRepository.createState({
       name,
-      stateAcronym,
+      abbreviation,
     });
   }
 
   async createDefaultStates(): Promise<void> {
     const statesList: State[] = [
-      { name: 'Acre', stateAcronym: 'AC' },
-      { name: 'Alagoas', stateAcronym: 'AL' },
-      { name: 'Amapá', stateAcronym: 'AP' },
-      { name: 'Amazonas', stateAcronym: 'AM' },
-      { name: 'Bahia', stateAcronym: 'BA' },
-      { name: 'Ceará', stateAcronym: 'CE' },
-      { name: 'Distrito Federal', stateAcronym: 'DF' },
-      { name: 'Espírito Santo', stateAcronym: 'ES' },
-      { name: 'Goiás', stateAcronym: 'GO' },
-      { name: 'Maranhão', stateAcronym: 'MA' },
-      { name: 'Mato Grosso', stateAcronym: 'MT' },
-      { name: 'Mato Grosso do Sul', stateAcronym: 'MS' },
-      { name: 'Minas Gerais', stateAcronym: 'MG' },
-      { name: 'Pará', stateAcronym: 'PA' },
-      { name: 'Paraíba', stateAcronym: 'PB' },
-      { name: 'Paraná', stateAcronym: 'PR' },
-      { name: 'Pernambuco', stateAcronym: 'PE' },
-      { name: 'Piauí', stateAcronym: 'PI' },
-      { name: 'Rio de Janeiro', stateAcronym: 'RJ' },
-      { name: 'Rio Grande do Norte', stateAcronym: 'RN' },
-      { name: 'Rio Grande do Sul', stateAcronym: 'RS' },
-      { name: 'Rondônia', stateAcronym: 'RO' },
-      { name: 'Roraima', stateAcronym: 'RR' },
-      { name: 'Santa Catarina', stateAcronym: 'SC' },
-      { name: 'São Paulo', stateAcronym: 'SP' },
-      { name: 'Sergipe', stateAcronym: 'SE' },
-      { name: 'Tocantins', stateAcronym: 'TO' },
+      { name: 'Acre', abbreviation: 'AC' },
+      { name: 'Alagoas', abbreviation: 'AL' },
+      { name: 'Amapá', abbreviation: 'AP' },
+      { name: 'Amazonas', abbreviation: 'AM' },
+      { name: 'Bahia', abbreviation: 'BA' },
+      { name: 'Ceará', abbreviation: 'CE' },
+      { name: 'Distrito Federal', abbreviation: 'DF' },
+      { name: 'Espírito Santo', abbreviation: 'ES' },
+      { name: 'Goiás', abbreviation: 'GO' },
+      { name: 'Maranhão', abbreviation: 'MA' },
+      { name: 'Mato Grosso', abbreviation: 'MT' },
+      { name: 'Mato Grosso do Sul', abbreviation: 'MS' },
+      { name: 'Minas Gerais', abbreviation: 'MG' },
+      { name: 'Pará', abbreviation: 'PA' },
+      { name: 'Paraíba', abbreviation: 'PB' },
+      { name: 'Paraná', abbreviation: 'PR' },
+      { name: 'Pernambuco', abbreviation: 'PE' },
+      { name: 'Piauí', abbreviation: 'PI' },
+      { name: 'Rio de Janeiro', abbreviation: 'RJ' },
+      { name: 'Rio Grande do Norte', abbreviation: 'RN' },
+      { name: 'Rio Grande do Sul', abbreviation: 'RS' },
+      { name: 'Rondônia', abbreviation: 'RO' },
+      { name: 'Roraima', abbreviation: 'RR' },
+      { name: 'Santa Catarina', abbreviation: 'SC' },
+      { name: 'São Paulo', abbreviation: 'SP' },
+      { name: 'Sergipe', abbreviation: 'SE' },
+      { name: 'Tocantins', abbreviation: 'TO' },
     ];
 
     await this.stateRepository.createDefaultStates(statesList);

@@ -115,6 +115,16 @@ Nest is [MIT licensed](LICENSE).
 
 - Excluir o container: `docker-compose down`
 
+## Alguns comandos importantes do Prisma:
+
+- Recriar o esquema do Prisma para refletir as mudanças nas tabelas: `npx prisma generate`
+
+- Sincronizar o schema com o banco de dados: `npx prisma db push`
+
+- Criar novas migrações a partir do schema atual: `npx prisma migrate dev --name init`
+
+- Aplicar as novas migrações: `npx prisma migrate deploy`
+
 ## Materiais para ajudar
 
 [Dio: Entendendo controllers, services e repositories](https://www.dio.me/articles/entendendo-controllers-services-e-repositories-em-aplicacoes-nodejs-com-typescript)
