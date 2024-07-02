@@ -10,12 +10,12 @@ export class PrismaBarbershopRepository implements BarbershopRepository {
   async create(barbershopData: Barbershop): Promise<void> {
     const { name, phone, cnpj, addressId } = barbershopData;
 
-    await this.prisma.barbearia.create({
+    await this.prisma.barbershop.create({
       data: {
-        nome: name,
-        telefone: phone,
-        cnpj: cnpj,
-        enderecoId: addressId,
+        name,
+        phone,
+        cnpj,
+        addressId,
       },
     });
   }

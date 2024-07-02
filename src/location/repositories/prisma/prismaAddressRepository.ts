@@ -12,13 +12,13 @@ export class PrismaAddressRepository implements AddressRepository {
   async createAddress(addressData: Address): Promise<number> {
     const { street, neighborhood, number, zipcode, cityId } = addressData;
 
-    const newAddress = await this.prisma.endereco.create({
+    const newAddress: Address = await this.prisma.barbershopAddress.create({
       data: {
-        logradouro: street,
-        numero: number,
-        bairro: neighborhood,
-        cep: zipcode,
-        cidadeId: cityId,
+        street,
+        number,
+        neighborhood,
+        zipcode,
+        cityId,
       },
     });
 

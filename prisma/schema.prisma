@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum DiasSemana {
+enum Weekdays {
   DOMINGO
   SEGUNDA
   TERCA
@@ -17,218 +17,226 @@ enum DiasSemana {
   SABADO
 }
 
-enum SituacaoAtendimento {
+enum AppointmentStatus {
   FINALIZADO
   AGUARDANDO
   CANCELADO
 }
 
-enum StatusPagamento {
+enum PaymentStatus {
   PENDENTE
   QUITADO
 }
 
-enum TipoCliente {
+enum CustomerType {
   PF
   PJ
 }
 
-enum TipoUsuario {
-  BARBEIRO
-  CLIENTE
+enum UserType {
+  BARBER
+  CUSTOMER
   ADMIN
 }
 
-model Usuario {
-  id       Int         @id @default(autoincrement())
-  nome     String
-  cpf      String      @unique
-  telefone String
-  email    String
-  tipo     TipoUsuario
+model User {
+  id    Int      @id @default(autoincrement())
+  name  String
+  cpf   String   @unique
+  phone String
+  email String   @unique
+  type  UserType @default(CUSTOMER)
 
-  cliente  Cliente?
-  admin    Administrador?
-  barbeiro Barbeiro?
+  customer Customer?
+  admin    Admin?
+  barber   Barber?
 
   @@index([cpf])
-  @@index([telefone])
+  @@index([phone])
 }
 
-model Cliente {
-  usuarioId             Int                    @id
-  usuario               Usuario                @relation(fields: [usuarioId], references: [id])
-  tipo                  TipoCliente
-  agendamentos          Agendamento[]
-  logStatusAtendimentos LogStatusAtendimento[]
+model Customer {
+  userId       Int                        @id
+  type         CustomerType
+  appointments BarbershopAppointments[]
+  updateLog    ServiceDeliveryStatusLog[]
+
+  user User @relation(fields: [userId], references: [id])
 }
 
-model Matricula {
-  id       Int            @id @default(autoincrement())
-  admin    Administrador?
-  barbeiro Barbeiro?
+model Enrollment {
+  id     Int     @id @default(autoincrement())
+  admin  Admin?
+  barber Barber?
 }
 
-model Administrador {
-  usuarioId             Int                    @id
-  matriculaId           Int                    @unique
-  logStatusAtendimentos LogStatusAtendimento[]
+model Admin {
+  userId     Int                        @id
+  employeeId Int                        @unique
+  updateLog  ServiceDeliveryStatusLog[]
 
-  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
-  matricula Matricula @relation(fields: [matriculaId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  enrollment Enrollment @relation(fields: [employeeId], references: [id])
 }
 
-model Barbeiro {
-  usuarioId             Int                    @id
-  matriculaId           Int                    @unique
-  servicos              BarbeiroServico[]
-  agendamentos          Agendamento[]
-  agenda                AgendaBarbeiro[]
-  logStatusAtendimentos LogStatusAtendimento[]
+model Barber {
+  userId           Int                        @unique
+  employeeId       Int                        @id
+  servicesProvided BarberServices[]
+  appointments     BarbershopAppointments[]
+  schedule         BarberSchedule[]
+  updateLog        ServiceDeliveryStatusLog[]
 
-  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
-  matricula Matricula @relation(fields: [matriculaId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  enrollment Enrollment @relation(fields: [employeeId], references: [id])
 }
 
-model AgendaBarbeiro {
-  id               Int        @default(autoincrement())
-  barbeiroId       Int
-  dia              DiasSemana
-  abertura         String
-  intervaloSaida   String
-  intervaloRetorno String
-  encerramento     String
+model BarberSchedule {
+  id             Int      @id @default(autoincrement())
+  barberId       Int
+  weekday        Weekdays
+  startTime      String
+  breakTimeStart String
+  breakTimeEnd   String
+  endTime        String
 
-  barbeiro Barbeiro @relation(fields: [barbeiroId], references: [usuarioId])
+  barber Barber @relation(fields: [barberId], references: [employeeId])
 
-  @@id([id, barbeiroId])
-  @@index([dia, barbeiroId])
+  @@index([weekday])
+  @@index([barberId])
 }
 
-model Barbearia {
-  id         Int      @id @default(autoincrement())
-  nome       String
-  telefone   String
-  cnpj       String   @unique
-  endereco   Endereco @relation(fields: [enderecoId], references: [id])
-  enderecoId Int      @unique
+model Barbershop {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  phone                  String
+  cnpj                   String                   @unique
+  addressId              Int                      @unique
+  barbershopServices     BarbershopServices[]
+  barbershopAppointments BarbershopAppointments[]
+
+  address BarbershopAddress @relation(fields: [addressId], references: [id])
 
   @@index([cnpj])
-  @@index([nome])
+  @@index([name])
 }
 
-model Servico {
-  id                  Int                  @id @default(autoincrement())
-  nome                String
-  preco               Decimal
-  mediaDuracao        String
-  barbeiros           BarbeiroServico[]
-  agendamentoServicos AgendamentoServico[]
+model BarbershopServices {
+  id                  Int                @id @default(autoincrement())
+  name                String
+  price               Decimal
+  duration            String
+  barbershopId        Int
+  barbers             BarberServices[]
+  appointmentServices ScheduledService[]
+
+  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
 }
 
-model BarbeiroServico {
-  barbeiroId Int
-  servicoId  Int
+model BarberServices {
+  barberId  Int
+  serviceId Int
 
-  barbeiro Barbeiro @relation(fields: [barbeiroId], references: [usuarioId])
-  servico  Servico  @relation(fields: [servicoId], references: [id])
+  barber  Barber             @relation(fields: [barberId], references: [employeeId])
+  service BarbershopServices @relation(fields: [serviceId], references: [id])
 
-  @@id([barbeiroId, servicoId])
+  @@id([barberId, serviceId])
 }
 
-model Agendamento {
-  id                  Int                  @id @default(autoincrement())
-  clienteId           Int
-  barbeiroId          Int
-  horario             DateTime
-  agendamentoServicos AgendamentoServico[]
+model BarbershopAppointments {
+  id                Int                @id @default(autoincrement())
+  customerId        Int
+  barberId          Int
+  barbershopId      Int
+  dateTime          DateTime
+  serviceDelivery   ServiceDelivery?
+  scheduledServices ScheduledService[]
 
-  atendimentoId Int         @unique
-  atendimento   Atendimento @relation(fields: [atendimentoId], references: [id])
-
-  cliente  Cliente  @relation(fields: [clienteId], references: [usuarioId])
-  barbeiro Barbeiro @relation(fields: [barbeiroId], references: [usuarioId])
+  customer   Customer   @relation(fields: [customerId], references: [userId])
+  barber     Barber     @relation(fields: [barberId], references: [employeeId])
+  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
 }
 
-model AgendamentoServico {
-  agendamentoId Int
-  servicoId     Int
+model ScheduledService {
+  appointmentId Int
+  serviceId     Int
 
-  agendamento Agendamento @relation(fields: [agendamentoId], references: [id])
-  servico     Servico     @relation(fields: [servicoId], references: [id])
+  barbershopAppointment BarbershopAppointments @relation(fields: [appointmentId], references: [id])
+  service               BarbershopServices     @relation(fields: [serviceId], references: [id])
 
-  @@id([agendamentoId, servicoId])
+  @@id([appointmentId, serviceId])
 }
 
-model Atendimento {
-  id          Int                @id @default(autoincrement())
-  precoTotal  Decimal
-  agendamento Agendamento?
-  status      StatusAtendimento?
+//Atendimento
+model ServiceDelivery {
+  id            Int                    @id @default(autoincrement())
+  totalPrice    Decimal
+  appointmentId Int                    @unique
+  status        ServiceDeliveryStatus?
+
+  barbershopAppointment BarbershopAppointments @relation(fields: [appointmentId], references: [id])
 }
 
-model StatusAtendimento {
-  id              Int                    @id @default(autoincrement())
-  atendimentoId   Int                    @unique
-  observacao      String
-  status          SituacaoAtendimento
-  statusPagamento StatusPagamento
-  logAlteracoes   LogStatusAtendimento[]
+model ServiceDeliveryStatus {
+  id                Int                        @id @default(autoincrement())
+  serviceDeliveryId Int                        @unique
+  note              String                     @db.Text
+  appointmentStatus AppointmentStatus
+  paymentStatus     PaymentStatus
+  log               ServiceDeliveryStatusLog[]
 
-  atendimento Atendimento @relation(fields: [atendimentoId], references: [id])
+  serviceDelivery ServiceDelivery @relation(fields: [serviceDeliveryId], references: [id])
 
-  @@index([atendimentoId])
+  @@index([serviceDeliveryId])
 }
 
-model LogStatusAtendimento {
-  id                  Int      @id @default(autoincrement())
-  statusAtendimentoId Int
-  ultimaAtualizacao   DateTime
-  alteradoPor         Int
+model ServiceDeliveryStatusLog {
+  id                      Int      @id @default(autoincrement())
+  serviceDeliveryStatusId Int
+  lastUpdate              DateTime
+  modifiedBy              Int
 
-  statusAtendimento StatusAtendimento @relation(fields: [statusAtendimentoId], references: [id])
+  serviceDeliveryStatus ServiceDeliveryStatus @relation(fields: [serviceDeliveryStatusId], references: [id])
 
-  alteradoPorCliente Cliente? @relation(fields: [alteradoPor], references: [usuarioId], map: "fk_log_status_cliente")
+  modifiedByCustomer Customer? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_customer_log")
 
-  alteradoPorBarbeiro Barbeiro? @relation(fields: [alteradoPor], references: [usuarioId], map: "fk_log_status_barbeiro")
+  modifiedByBarber Barber? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_barber_log")
 
-  alteradoPorAdmin Administrador? @relation(fields: [alteradoPor], references: [usuarioId], map: "fk_log_status_admin")
+  modifiedByAdmin Admin? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_admin_log")
 
-  @@index([alteradoPor])
-  @@index([statusAtendimentoId])
+  @@index([modifiedBy])
+  @@index([serviceDeliveryStatusId])
 }
 
-model Endereco {
-  id         Int    @id @default(autoincrement())
-  logradouro String
-  numero     String
-  bairro     String
-  cep        String
+model BarbershopAddress {
+  id           Int         @id @default(autoincrement())
+  street       String
+  number       String
+  neighborhood String
+  zipcode      String
+  cityId       Int         @unique
+  barbershop   Barbershop?
 
-  cidade   Cidade @relation(fields: [cidadeId], references: [id])
-  cidadeId Int    @unique
+  city City @relation(fields: [cityId], references: [id])
 
-  barbearia Barbearia?
-
-  @@index([cep])
+  @@index([zipcode])
 }
 
-model Cidade {
-  id   Int    @id @default(autoincrement())
-  nome String
+model City {
+  id        Int                 @id @default(autoincrement())
+  name      String
+  stateId   Int                 @unique
+  addresses BarbershopAddress[]
 
-  estado   Estado @relation(fields: [estadoId], references: [id])
-  estadoId Int    @unique
-
-  enderecos Endereco[]
+  state State @relation(fields: [stateId], references: [id])
 }
 
-model Estado {
-  id    Int    @id @default(autoincrement())
-  nome  String
-  sigla String
+model State {
+  id           Int    @id @default(autoincrement())
+  name         String
+  stateAcronym String @unique @db.Char(2)
 
-  cidades Cidade[]
+  cities City[]
 
-  @@index([sigla])
+  @@index([stateAcronym])
 }

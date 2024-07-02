@@ -11,13 +11,28 @@ export class PrismaStateRepository implements StateRepository {
   async createState(stateData: State): Promise<number> {
     const { name, stateAcronym } = stateData;
 
-    const newState = await this.prisma.estado.create({
+    const newState: State = await this.prisma.state.create({
       data: {
-        nome: name,
-        sigla: stateAcronym,
+        name,
+        stateAcronym,
       },
     });
 
     return newState.id;
+  }
+
+  async countStates(): Promise<number> {
+    return await this.prisma.state.count();
+  }
+
+  async getAllStates(): Promise<State[]> {
+    return await this.prisma.state.findMany();
+  }
+
+  async createDefaultStates(statesList: State[]): Promise<void> {
+    await this.prisma.state.createMany({
+      data: statesList,
+      skipDuplicates: true,
+    });
   }
 }

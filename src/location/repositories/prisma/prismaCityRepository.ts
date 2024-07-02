@@ -12,10 +12,10 @@ export class PrismaCityRepository implements CityRepository {
   async createCity(cityData: City): Promise<number> {
     const { name, stateId } = cityData;
 
-    const newCity = await this.prisma.cidade.create({
+    const newCity: City = await this.prisma.city.create({
       data: {
-        nome: name,
-        estadoId: stateId,
+        name,
+        stateId,
       },
     });
 
