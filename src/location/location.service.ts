@@ -40,11 +40,7 @@ export class LocationService implements OnModuleInit {
   }
 
   async createCity(cityData: CreateCity): Promise<number> {
-    const { name, state } = cityData;
-
-    const stateId: number = await this.createState(state);
-
-    return await this.cityRepository.createCity({ name, stateId });
+    return await this.cityRepository.createCity(cityData);
   }
 
   async createState(stateData: CreateState): Promise<number> {

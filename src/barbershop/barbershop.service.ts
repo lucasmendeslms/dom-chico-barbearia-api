@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LocationService } from 'src/location/location.service';
 // import { UpdateBarbershopDto } from './dto/update-barbershop.dto';
 import { BarbershopRepository } from './repositories/barbershopRepository';
 import { CreateBarbershopDto } from './dto/create-barbershop.dto';
+import { Barbershop } from './entities/barbershop.entity';
 
 @Injectable()
 export class BarbershopService {
@@ -23,8 +24,14 @@ export class BarbershopService {
     return `This action returns all barbershop`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} barbershop`;
+  async findOne(id: number): Promise<Barbershop> {
+    const barbershop = await this.barbershopRepository.findOne(id);
+
+    if (!barbershop) {
+      throw new NotFoundException('Faio');
+    }
+
+    return barbershop;
   }
 
   update(id: number) {

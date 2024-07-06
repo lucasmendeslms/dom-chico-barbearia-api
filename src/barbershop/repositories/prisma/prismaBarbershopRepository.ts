@@ -19,4 +19,12 @@ export class PrismaBarbershopRepository implements BarbershopRepository {
       },
     });
   }
+
+  async findOne(id: number): Promise<Barbershop> {
+    return await this.prisma.barbershop.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 }

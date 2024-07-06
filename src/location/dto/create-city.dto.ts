@@ -1,12 +1,9 @@
-import { Type } from 'class-transformer';
-import { IsString, ValidateNested } from 'class-validator';
-import { CreateState } from './create-state.dto';
+import { IsString, IsNumber } from 'class-validator';
 
 export class CreateCity {
   @IsString()
   name: string;
 
-  @ValidateNested()
-  @Type(() => CreateState)
-  state: CreateState;
+  @IsNumber()
+  stateId: number;
 }
