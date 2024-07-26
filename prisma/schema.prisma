@@ -40,12 +40,15 @@ enum UserType {
 }
 
 model User {
-  id    Int      @id @default(autoincrement())
-  name  String
-  cpf   String   @unique
-  phone String
-  email String   @unique
-  type  UserType @default(CUSTOMER)
+  id              Int       @id @default(autoincrement())
+  googleAccountId Int       @unique
+  name            String
+  cpf             String    @unique
+  phone           String
+  email           String    @unique
+  type            UserType  @default(CUSTOMER)
+  picture         String?
+  sessions        Session[]
 
   customer Customer?
   admin    Admin?
@@ -53,6 +56,18 @@ model User {
 
   @@index([cpf])
   @@index([phone])
+  @@index([googleAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Customer {
@@ -61,7 +76,7 @@ model Customer {
   appointments BarbershopAppointments[]
   updateLog    ServiceDeliveryStatusLog[]
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Enrollment {
@@ -71,24 +86,27 @@ model Enrollment {
 }
 
 model Admin {
-  userId     Int                        @id
-  employeeId Int                        @unique
-  updateLog  ServiceDeliveryStatusLog[]
+  userId      Int                        @id
+  employeeId  Int                        @unique
+  updateLog   ServiceDeliveryStatusLog[]
+  barbershops Barbershop[]
 
-  user       User       @relation(fields: [userId], references: [id])
-  enrollment Enrollment @relation(fields: [employeeId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrollment Enrollment @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model Barber {
-  userId           Int                        @unique
-  employeeId       Int                        @id
+  userId           Int                        @id
+  employeeId       Int                        @unique
   servicesProvided BarberServices[]
   appointments     BarbershopAppointments[]
   schedule         BarberSchedule[]
   updateLog        ServiceDeliveryStatusLog[]
+  barbershopId     Int
 
-  user       User       @relation(fields: [userId], references: [id])
-  enrollment Enrollment @relation(fields: [employeeId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrollment Enrollment @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
 }
 
 model BarberSchedule {
@@ -100,7 +118,7 @@ model BarberSchedule {
   breakTimeEnd   String
   endTime        String
 
-  barber Barber @relation(fields: [barberId], references: [employeeId])
+  barber Barber @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
 
   @@index([weekday])
   @@index([barberId])
@@ -114,8 +132,11 @@ model Barbershop {
   addressId              Int                      @unique
   barbershopServices     BarbershopServices[]
   barbershopAppointments BarbershopAppointments[]
+  barbers                Barber[]
+  adminId                Int
 
-  address BarbershopAddress @relation(fields: [addressId], references: [id])
+  address BarbershopAddress @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  admin   Admin             @relation(fields: [adminId], references: [userId], onDelete: Restrict)
 
   @@index([cnpj])
   @@index([name])
@@ -130,15 +151,15 @@ model BarbershopServices {
   barbers             BarberServices[]
   appointmentServices ScheduledService[]
 
-  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
+  barbershop Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 }
 
 model BarberServices {
   barberId  Int
   serviceId Int
 
-  barber  Barber             @relation(fields: [barberId], references: [employeeId])
-  service BarbershopServices @relation(fields: [serviceId], references: [id])
+  barber  Barber             @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
+  service BarbershopServices @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@id([barberId, serviceId])
 }
@@ -152,9 +173,9 @@ model BarbershopAppointments {
   serviceDelivery   ServiceDelivery?
   scheduledServices ScheduledService[]
 
-  customer   Customer   @relation(fields: [customerId], references: [userId])
+  customer   Customer   @relation(fields: [customerId], references: [userId], onDelete: Restrict)
   barber     Barber     @relation(fields: [barberId], references: [employeeId])
-  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
+  barbershop Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Restrict)
 }
 
 model ScheduledService {
@@ -196,13 +217,13 @@ model ServiceDeliveryStatusLog {
   lastUpdate              DateTime
   modifiedBy              Int
 
-  serviceDeliveryStatus ServiceDeliveryStatus @relation(fields: [serviceDeliveryStatusId], references: [id])
+  serviceDeliveryStatus ServiceDeliveryStatus @relation(fields: [serviceDeliveryStatusId], references: [id], onDelete: Cascade)
 
-  modifiedByCustomer Customer? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_customer_log")
+  modifiedByCustomer Customer? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_customer_log", onDelete: Cascade)
 
-  modifiedByBarber Barber? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_barber_log")
+  modifiedByBarber Barber? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_barber_log", onDelete: Cascade)
 
-  modifiedByAdmin Admin? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_admin_log")
+  modifiedByAdmin Admin? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_admin_log", onDelete: Cascade)
 
   @@index([modifiedBy])
   @@index([serviceDeliveryStatusId])
