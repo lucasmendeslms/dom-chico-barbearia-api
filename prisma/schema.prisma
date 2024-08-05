@@ -7,6 +7,196 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id              Int       @id @default(autoincrement())
+  googleAccountId String    @unique
+  name            String
+  cpf             String    @unique
+  phone           String
+  email           String    @unique
+  type            UserType? @default(CUSTOMER)
+  picture         String?
+  admin           Admin?
+  barber          Barber?
+  customer        Customer?
+
+  @@index([cpf])
+  @@index([googleAccountId])
+  @@index([phone])
+}
+
+model Customer {
+  userId       Int                        @id
+  user         User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments BarbershopAppointments[]
+  updateLog    ServiceDeliveryStatusLog[]
+}
+
+model Enrollment {
+  id     Int     @id @default(autoincrement())
+  admin  Admin?
+  barber Barber?
+}
+
+model Admin {
+  userId      Int                        @id
+  employeeId  Int                        @unique
+  enrollment  Enrollment                 @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  user        User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barbershops Barbershop[]
+  updateLog   ServiceDeliveryStatusLog[]
+}
+
+model Barber {
+  userId           Int                        @id
+  employeeId       Int                        @unique
+  barbershopId     Int
+  barbershop       Barbershop                 @relation(fields: [barbershopId], references: [id])
+  enrollment       Enrollment                 @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  user             User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedule         BarberSchedule[]
+  servicesProvided BarberServices[]
+  appointments     BarbershopAppointments[]
+  updateLog        ServiceDeliveryStatusLog[]
+}
+
+model BarberSchedule {
+  id             Int      @id @default(autoincrement())
+  barberId       Int
+  weekday        Weekdays
+  startTime      String
+  breakTimeStart String
+  breakTimeEnd   String
+  endTime        String
+  barber         Barber   @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
+
+  @@index([barberId])
+  @@index([weekday])
+}
+
+model Barbershop {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  phone                  String
+  cnpj                   String                   @unique
+  addressId              Int                      @unique
+  adminId                Int
+  address                BarbershopAddress        @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  admin                  Admin                    @relation(fields: [adminId], references: [userId])
+  barbers                Barber[]
+  barbershopAppointments BarbershopAppointments[]
+  barbershopServices     BarbershopServices[]
+
+  @@index([cnpj])
+  @@index([name])
+}
+
+model BarbershopServices {
+  id                  Int                @id @default(autoincrement())
+  name                String
+  price               Decimal
+  duration            String
+  barbershopId        Int
+  barbershop          Barbershop         @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  barbers             BarberServices[]
+  appointmentServices ScheduledService[]
+}
+
+model BarberServices {
+  barberId  Int
+  serviceId Int
+  barber    Barber             @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
+  service   BarbershopServices @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([barberId, serviceId])
+}
+
+model BarbershopAppointments {
+  id                Int                @id @default(autoincrement())
+  customerId        Int
+  barberId          Int
+  barbershopId      Int
+  dateTime          DateTime
+  barber            Barber             @relation(fields: [barberId], references: [employeeId])
+  barbershop        Barbershop         @relation(fields: [barbershopId], references: [id])
+  customer          Customer           @relation(fields: [customerId], references: [userId])
+  scheduledServices ScheduledService[]
+  serviceDelivery   ServiceDelivery?
+}
+
+model ScheduledService {
+  appointmentId         Int
+  serviceId             Int
+  barbershopAppointment BarbershopAppointments @relation(fields: [appointmentId], references: [id])
+  service               BarbershopServices     @relation(fields: [serviceId], references: [id])
+
+  @@id([appointmentId, serviceId])
+}
+
+model ServiceDelivery {
+  id                    Int                    @id @default(autoincrement())
+  totalPrice            Decimal
+  appointmentId         Int                    @unique
+  barbershopAppointment BarbershopAppointments @relation(fields: [appointmentId], references: [id])
+  status                ServiceDeliveryStatus?
+}
+
+model ServiceDeliveryStatus {
+  id                Int                        @id @default(autoincrement())
+  serviceDeliveryId Int                        @unique
+  note              String
+  appointmentStatus AppointmentStatus
+  paymentStatus     PaymentStatus
+  serviceDelivery   ServiceDelivery            @relation(fields: [serviceDeliveryId], references: [id])
+  log               ServiceDeliveryStatusLog[]
+
+  @@index([serviceDeliveryId])
+}
+
+model ServiceDeliveryStatusLog {
+  id                      Int                   @id @default(autoincrement())
+  serviceDeliveryStatusId Int
+  lastUpdate              DateTime
+  modifiedBy              Int
+  modifiedByCustomer      Customer              @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_customer_log")
+  modifiedByBarber        Barber                @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_barber_log")
+  modifiedByAdmin         Admin                 @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_admin_log")
+  serviceDeliveryStatus   ServiceDeliveryStatus @relation(fields: [serviceDeliveryStatusId], references: [id], onDelete: Cascade)
+
+  @@index([modifiedBy])
+  @@index([serviceDeliveryStatusId])
+}
+
+model BarbershopAddress {
+  id           Int         @id @default(autoincrement())
+  street       String
+  number       String
+  neighborhood String
+  zipcode      String
+  cityId       Int         @unique
+  city         City        @relation(fields: [cityId], references: [id])
+  barbershop   Barbershop?
+
+  @@index([zipcode])
+}
+
+model City {
+  id        Int                @id @default(autoincrement())
+  name      String
+  stateId   Int                @unique
+  state     State              @relation(fields: [stateId], references: [id])
+  addresses BarbershopAddress?
+}
+
+model State {
+  id           Int    @id @default(autoincrement())
+  name         String
+  abbreviation String @unique @db.Char(2)
+  cities       City?
+
+  @@index([abbreviation])
+}
+
 enum Weekdays {
   DOMINGO
   SEGUNDA
@@ -28,235 +218,8 @@ enum PaymentStatus {
   QUITADO
 }
 
-enum CustomerType {
-  PF
-  PJ
-}
-
 enum UserType {
   BARBER
   CUSTOMER
   ADMIN
-}
-
-model User {
-  id              Int       @id @default(autoincrement())
-  googleAccountId Int       @unique
-  name            String
-  cpf             String    @unique
-  phone           String
-  email           String    @unique
-  type            UserType  @default(CUSTOMER)
-  picture         String?
-  sessions        Session[]
-
-  customer Customer?
-  admin    Admin?
-  barber   Barber?
-
-  @@index([cpf])
-  @@index([phone])
-  @@index([googleAccountId])
-}
-
-model Session {
-  sessionToken String   @unique
-  userId       Int
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Customer {
-  userId       Int                        @id
-  type         CustomerType
-  appointments BarbershopAppointments[]
-  updateLog    ServiceDeliveryStatusLog[]
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Enrollment {
-  id     Int     @id @default(autoincrement())
-  admin  Admin?
-  barber Barber?
-}
-
-model Admin {
-  userId      Int                        @id
-  employeeId  Int                        @unique
-  updateLog   ServiceDeliveryStatusLog[]
-  barbershops Barbershop[]
-
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  enrollment Enrollment @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-}
-
-model Barber {
-  userId           Int                        @id
-  employeeId       Int                        @unique
-  servicesProvided BarberServices[]
-  appointments     BarbershopAppointments[]
-  schedule         BarberSchedule[]
-  updateLog        ServiceDeliveryStatusLog[]
-  barbershopId     Int
-
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  enrollment Enrollment @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
-}
-
-model BarberSchedule {
-  id             Int      @id @default(autoincrement())
-  barberId       Int
-  weekday        Weekdays
-  startTime      String
-  breakTimeStart String
-  breakTimeEnd   String
-  endTime        String
-
-  barber Barber @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
-
-  @@index([weekday])
-  @@index([barberId])
-}
-
-model Barbershop {
-  id                     Int                      @id @default(autoincrement())
-  name                   String
-  phone                  String
-  cnpj                   String                   @unique
-  addressId              Int                      @unique
-  barbershopServices     BarbershopServices[]
-  barbershopAppointments BarbershopAppointments[]
-  barbers                Barber[]
-  adminId                Int
-
-  address BarbershopAddress @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  admin   Admin             @relation(fields: [adminId], references: [userId], onDelete: Restrict)
-
-  @@index([cnpj])
-  @@index([name])
-}
-
-model BarbershopServices {
-  id                  Int                @id @default(autoincrement())
-  name                String
-  price               Decimal
-  duration            String
-  barbershopId        Int
-  barbers             BarberServices[]
-  appointmentServices ScheduledService[]
-
-  barbershop Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-}
-
-model BarberServices {
-  barberId  Int
-  serviceId Int
-
-  barber  Barber             @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
-  service BarbershopServices @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-
-  @@id([barberId, serviceId])
-}
-
-model BarbershopAppointments {
-  id                Int                @id @default(autoincrement())
-  customerId        Int
-  barberId          Int
-  barbershopId      Int
-  dateTime          DateTime
-  serviceDelivery   ServiceDelivery?
-  scheduledServices ScheduledService[]
-
-  customer   Customer   @relation(fields: [customerId], references: [userId], onDelete: Restrict)
-  barber     Barber     @relation(fields: [barberId], references: [employeeId])
-  barbershop Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Restrict)
-}
-
-model ScheduledService {
-  appointmentId Int
-  serviceId     Int
-
-  barbershopAppointment BarbershopAppointments @relation(fields: [appointmentId], references: [id])
-  service               BarbershopServices     @relation(fields: [serviceId], references: [id])
-
-  @@id([appointmentId, serviceId])
-}
-
-//Atendimento
-model ServiceDelivery {
-  id            Int                    @id @default(autoincrement())
-  totalPrice    Decimal
-  appointmentId Int                    @unique
-  status        ServiceDeliveryStatus?
-
-  barbershopAppointment BarbershopAppointments @relation(fields: [appointmentId], references: [id])
-}
-
-model ServiceDeliveryStatus {
-  id                Int                        @id @default(autoincrement())
-  serviceDeliveryId Int                        @unique
-  note              String                     @db.Text
-  appointmentStatus AppointmentStatus
-  paymentStatus     PaymentStatus
-  log               ServiceDeliveryStatusLog[]
-
-  serviceDelivery ServiceDelivery @relation(fields: [serviceDeliveryId], references: [id])
-
-  @@index([serviceDeliveryId])
-}
-
-model ServiceDeliveryStatusLog {
-  id                      Int      @id @default(autoincrement())
-  serviceDeliveryStatusId Int
-  lastUpdate              DateTime
-  modifiedBy              Int
-
-  serviceDeliveryStatus ServiceDeliveryStatus @relation(fields: [serviceDeliveryStatusId], references: [id], onDelete: Cascade)
-
-  modifiedByCustomer Customer? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_customer_log", onDelete: Cascade)
-
-  modifiedByBarber Barber? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_barber_log", onDelete: Cascade)
-
-  modifiedByAdmin Admin? @relation(fields: [modifiedBy], references: [userId], map: "fk_modified_by_admin_log", onDelete: Cascade)
-
-  @@index([modifiedBy])
-  @@index([serviceDeliveryStatusId])
-}
-
-model BarbershopAddress {
-  id           Int         @id @default(autoincrement())
-  street       String
-  number       String
-  neighborhood String
-  zipcode      String
-  cityId       Int         @unique
-  barbershop   Barbershop?
-
-  city City @relation(fields: [cityId], references: [id])
-
-  @@index([zipcode])
-}
-
-model City {
-  id        Int                 @id @default(autoincrement())
-  name      String
-  stateId   Int                 @unique
-  addresses BarbershopAddress[]
-
-  state State @relation(fields: [stateId], references: [id])
-}
-
-model State {
-  id           Int    @id @default(autoincrement())
-  name         String
-  abbreviation String @unique @db.Char(2)
-  cities       City[]
-
-  @@index([abbreviation])
 }

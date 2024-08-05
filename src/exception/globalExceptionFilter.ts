@@ -21,13 +21,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    const message =
+      exception instanceof HttpException
+        ? exception.message
+        : 'Internal server error';
+
     const responseBody = {
       status: httpStatus,
-      timestamp: new Date().toLocaleString('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
-        timeStyle: 'long',
-        dateStyle: 'short',
-      }),
+      timestamp: new Date(),
+      message,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
     };
 

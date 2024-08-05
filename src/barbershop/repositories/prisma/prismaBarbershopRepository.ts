@@ -8,7 +8,7 @@ export class PrismaBarbershopRepository implements BarbershopRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(barbershopData: Barbershop): Promise<void> {
-    const { name, phone, cnpj, addressId } = barbershopData;
+    const { name, phone, cnpj, addressId, adminId } = barbershopData;
 
     await this.prisma.barbershop.create({
       data: {
@@ -16,6 +16,7 @@ export class PrismaBarbershopRepository implements BarbershopRepository {
         phone,
         cnpj,
         addressId,
+        adminId,
       },
     });
   }

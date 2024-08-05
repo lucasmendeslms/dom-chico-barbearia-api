@@ -1,22 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { UserRepository } from './repositories/userRepository';
+import { User } from './entities/user.entity';
+// import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private userRepository: UserRepository) {}
+
+  async create(userData: User): Promise<User> {
+    const isExistingUser: User | null =
+      await this.userRepository.findByGoogleAccount(userData.googleAccountId);
+
+    if (isExistingUser) {
+      throw new ConflictException('User already exists');
+    }
+
+    const user: User = await this.userRepository.create(userData);
+    return user;
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findByGoogleAccount(id: string): Promise<User> {
+    const userData: User | null =
+      await this.userRepository.findByGoogleAccount(id);
+
+    if (!userData) {
+      throw new NotFoundException('User not found by google account');
+    }
+
+    return userData;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findById(id: number): Promise<User> {
+    const userData: User = await this.userRepository.findById(id);
+
+    if (!userData) {
+      throw new NotFoundException('User not found by ID');
+    }
+
+    return userData;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number) {
     return `This action updates a #${id} user`;
   }
 

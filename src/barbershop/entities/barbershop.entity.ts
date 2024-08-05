@@ -4,4 +4,5 @@ export interface Barbershop {
   phone: string;
   cnpj: string;
   addressId: number;
+  adminId: number;
 }

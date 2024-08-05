@@ -13,11 +13,17 @@ export class BarbershopService {
   ) {}
 
   async create(barbershopData: CreateBarbershopDto): Promise<void> {
-    const { name, phone, cnpj, address } = barbershopData;
+    const { name, phone, cnpj, address, adminId } = barbershopData;
 
     const addressId: number = await this.locationService.createAddress(address);
 
-    await this.barbershopRepository.create({ name, phone, cnpj, addressId });
+    await this.barbershopRepository.create({
+      name,
+      phone,
+      cnpj,
+      addressId,
+      adminId,
+    });
   }
 
   findAll() {
