@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { LocationService } from './location.service';
 import { LocationController } from './location.controller';
@@ -11,8 +11,11 @@ import { StateRepository } from './repositories/stateRepository';
 import { PrismaAddressRepository } from './repositories/prisma/prismaAddressRepository';
 import { PrismaCityRepository } from './repositories/prisma/prismaCityRepository';
 import { PrismaStateRepository } from './repositories/prisma/prismaStateRepository';
+import { BarbershopModule } from 'src/barbershop/barbershop.module';
+// import { BarbershopService } from 'src/barbershop/barbershop.service';
 
 @Module({
+  imports: [forwardRef(() => BarbershopModule)],
   controllers: [LocationController],
   providers: [
     LocationService,
@@ -21,6 +24,11 @@ import { PrismaStateRepository } from './repositories/prisma/prismaStateReposito
     { provide: CityRepository, useClass: PrismaCityRepository },
     { provide: StateRepository, useClass: PrismaStateRepository },
   ],
-  exports: [AddressRepository, CityRepository, StateRepository],
+  exports: [
+    AddressRepository,
+    CityRepository,
+    StateRepository,
+    LocationService,
+  ],
 })
 export class LocationModule {}

@@ -1,13 +1,23 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 
-import { CreateCity } from './dto/create-city.dto';
-import { CreateAddress } from './dto/create-address.dto';
-import { CreateState } from './dto/create-state.dto';
+import { CityDto } from './dto/city.dto';
+import { AddressDto } from './dto/address.dto';
+import { StateDto } from './dto/state.dto';
 
 import { AddressRepository } from './repositories/addressRepository';
 import { CityRepository } from './repositories/cityRepository';
 import { StateRepository } from './repositories/stateRepository';
 import { State } from './entities/state.entity';
+import { City } from './entities/city.entity';
+import { Barbershop } from 'src/barbershop/entities/barbershop.entity';
+import { BarbershopService } from 'src/barbershop/barbershop.service';
 
 @Injectable()
 export class LocationService implements OnModuleInit {
@@ -15,17 +25,13 @@ export class LocationService implements OnModuleInit {
     private addressRepository: AddressRepository,
     private cityRepository: CityRepository,
     private stateRepository: StateRepository,
+    @Inject(forwardRef(() => BarbershopService))
+    private barbershopService: BarbershopService,
   ) {}
 
-  async onModuleInit(): Promise<void> {
-    const countStates: number = await this.stateRepository.countStates();
+  //ADDRESS
 
-    if (countStates < 27) {
-      await this.createDefaultStates();
-    }
-  }
-
-  async createAddress(addressData: CreateAddress): Promise<number> {
+  async createAddress(addressData: AddressDto): Promise<number> {
     const { street, neighborhood, number, zipcode, city } = addressData;
 
     const cityId: number = await this.createCity(city);
@@ -39,11 +45,50 @@ export class LocationService implements OnModuleInit {
     });
   }
 
-  async createCity(cityData: CreateCity): Promise<number> {
+  //CITY
+
+  async createCity(cityData: CityDto): Promise<number> {
     return await this.cityRepository.createCity(cityData);
   }
 
-  async createState(stateData: CreateState): Promise<number> {
+  async findCitiesWithBarbershop(stateId: number): Promise<City[]> {
+    await this.findStateById(stateId);
+
+    const cities: City[] =
+      await this.cityRepository.findCitiesWithBarbershop(stateId);
+
+    if (!cities) {
+      throw new NotFoundException('There are no cities with barbershops');
+    }
+
+    return cities;
+  }
+
+  async findCityById(id: number): Promise<City> {
+    const city: City = await this.cityRepository.findCityById(id);
+
+    if (!city) {
+      throw new BadRequestException('Invalid city id');
+    }
+
+    return city;
+  }
+
+  async findBarbershopsByCity(cityId: number): Promise<Barbershop[]> {
+    return await this.barbershopService.findBarbershopsInCity(cityId);
+  }
+
+  //STATE
+
+  async onModuleInit(): Promise<void> {
+    const countStates: number = await this.stateRepository.countStates();
+
+    if (countStates < 27) {
+      await this.createDefaultStates();
+    }
+  }
+
+  async createState(stateData: StateDto): Promise<number> {
     const { name, abbreviation } = stateData;
 
     return await this.stateRepository.createState({
@@ -86,19 +131,32 @@ export class LocationService implements OnModuleInit {
     await this.stateRepository.createDefaultStates(statesList);
   }
 
-  findAll() {
-    return `This action returns all location`;
+  async findStatesWithBarbershop() {
+    const statesWithBarbershop: State[] =
+      await this.stateRepository.findStatesWithBarbershop();
+
+    if (!statesWithBarbershop.length) {
+      throw new NotFoundException('There are no states with barbershops');
+    }
+
+    return statesWithBarbershop;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} location`;
+  async findStateById(id: number): Promise<State> {
+    const state: State = await this.stateRepository.findStateById(id);
+
+    if (!state) {
+      throw new BadRequestException('Invalid state id');
+    }
+
+    return state;
   }
 
-  update(id: number) {
-    return `This action updates a #${id} location`;
-  }
+  // update(id: number) {
+  //   return `This action updates a #${id} location`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} location`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} location`;
+  // }
 }

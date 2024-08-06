@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { BarbershopService } from './barbershop.service';
 import { BarbershopController } from './barbershop.controller';
@@ -11,13 +11,14 @@ import { LocationModule } from 'src/location/location.module';
 import { LocationService } from 'src/location/location.service';
 
 @Module({
-  imports: [LocationModule],
+  imports: [forwardRef(() => LocationModule)],
   controllers: [BarbershopController],
   providers: [
     BarbershopService,
     PrismaService,
-    { provide: BarbershopRepository, useClass: PrismaBarbershopRepository },
     LocationService,
+    { provide: BarbershopRepository, useClass: PrismaBarbershopRepository },
   ],
+  exports: [BarbershopService, BarbershopRepository],
 })
 export class BarbershopModule {}

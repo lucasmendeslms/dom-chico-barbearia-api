@@ -1,6 +1,6 @@
 import { IsString, Length } from 'class-validator';
 
-export class CreateState {
+export class StateDto {
   @IsString()
   name: string;
 

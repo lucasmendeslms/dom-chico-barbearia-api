@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsString, ValidateNested } from 'class-validator';
-import { CreateCity } from './create-city.dto';
+import { CityDto } from './city.dto';
 
-export class CreateAddress {
+export class AddressDto {
   @IsString()
   street: string;
 
@@ -16,6 +16,6 @@ export class CreateAddress {
   zipcode: string;
 
   @ValidateNested()
-  @Type(() => CreateCity)
-  city: CreateCity;
+  @Type(() => CityDto)
+  city: CityDto;
 }

@@ -1,8 +1,8 @@
 import { IsNumber, IsString, ValidateNested } from 'class-validator';
-import { CreateAddress } from '../../location/dto/create-address.dto';
+import { AddressDto } from '../../location/dto/address.dto';
 import { Type } from 'class-transformer';
 
-export class CreateBarbershopDto {
+export class BarbershopDto {
   @IsString()
   name: string;
 
@@ -16,6 +16,6 @@ export class CreateBarbershopDto {
   adminId: number;
 
   @ValidateNested()
-  @Type(() => CreateAddress)
-  address: CreateAddress;
+  @Type(() => AddressDto)
+  address: AddressDto;
 }

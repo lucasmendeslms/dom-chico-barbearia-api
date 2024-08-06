@@ -21,4 +21,25 @@ export class PrismaCityRepository implements CityRepository {
 
     return newCity.id;
   }
+
+  async findCitiesWithBarbershop(stateId: number): Promise<City[]> {
+    return this.prisma.city.findMany({
+      where: {
+        stateId,
+        addresses: {
+          some: {
+            barbershop: {},
+          },
+        },
+      },
+    });
+  }
+
+  async findCityById(id: number): Promise<City> {
+    return this.prisma.city.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 }

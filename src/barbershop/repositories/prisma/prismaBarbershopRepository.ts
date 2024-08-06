@@ -21,10 +21,22 @@ export class PrismaBarbershopRepository implements BarbershopRepository {
     });
   }
 
-  async findOne(id: number): Promise<Barbershop> {
-    return await this.prisma.barbershop.findUnique({
+  async findBarbershopById(id: number): Promise<Barbershop> {
+    return this.prisma.barbershop.findUnique({
       where: {
         id,
+      },
+    });
+  }
+
+  findBarbershopsInCity(cityId: number): Promise<Barbershop[]> {
+    return this.prisma.barbershop.findMany({
+      where: {
+        address: {
+          city: {
+            id: cityId,
+          },
+        },
       },
     });
   }

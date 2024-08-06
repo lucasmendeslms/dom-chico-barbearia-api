@@ -1,6 +1,6 @@
 import { IsString, IsNumber } from 'class-validator';
 
-export class CreateCity {
+export class CityDto {
   @IsString()
   name: string;
 

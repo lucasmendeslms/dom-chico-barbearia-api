@@ -35,4 +35,28 @@ export class PrismaStateRepository implements StateRepository {
       skipDuplicates: true,
     });
   }
+
+  async findStatesWithBarbershop(): Promise<State[]> {
+    return this.prisma.state.findMany({
+      where: {
+        cities: {
+          some: {
+            addresses: {
+              some: {
+                barbershop: {},
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async findStateById(id: number): Promise<State> {
+    return this.prisma.state.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 }

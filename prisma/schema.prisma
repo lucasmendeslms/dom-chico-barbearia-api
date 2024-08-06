@@ -157,10 +157,10 @@ model ServiceDeliveryStatusLog {
   id                      Int                   @id @default(autoincrement())
   serviceDeliveryStatusId Int
   lastUpdate              DateTime
-  modifiedBy              Int
-  modifiedByCustomer      Customer              @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_customer_log")
-  modifiedByBarber        Barber                @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_barber_log")
-  modifiedByAdmin         Admin                 @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_admin_log")
+  modifiedBy              Int?
+  modifiedByCustomer      Customer?             @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_customer_log")
+  modifiedByBarber        Barber?               @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_barber_log")
+  modifiedByAdmin         Admin?                @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_admin_log")
   serviceDeliveryStatus   ServiceDeliveryStatus @relation(fields: [serviceDeliveryStatusId], references: [id], onDelete: Cascade)
 
   @@index([modifiedBy])

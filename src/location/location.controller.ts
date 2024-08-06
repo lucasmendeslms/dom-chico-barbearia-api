@@ -3,39 +3,61 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  // Patch,
   Param,
-  Delete,
+  ParseIntPipe,
+  // Delete,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
-import { CreateCity } from './dto/create-city.dto';
+import { CityDto } from './dto/city.dto';
+import { State } from './entities/state.entity';
+import { City } from './entities/city.entity';
+import { Barbershop } from 'src/barbershop/entities/barbershop.entity';
 
 @Controller('')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
-  @Post('cidade')
-  createCity(@Body() body: CreateCity) {
+  //ADDRESS
+
+  //CITY
+  @Post('city')
+  createCity(@Body() body: CityDto): Promise<number> {
     return this.locationService.createCity(body);
   }
 
-  @Get()
-  findAll() {
-    return this.locationService.findAll();
+  @Get('states/:stateId/cities')
+  async findCitiesWithBarbershop(
+    @Param('stateId', ParseIntPipe) stateId: number,
+  ): Promise<City[]> {
+    return await this.locationService.findCitiesWithBarbershop(stateId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.locationService.findOne(+id);
+  @Get('cities/:cityId/barbershops')
+  async findBarbershopsByCity(
+    @Param('cityId', ParseIntPipe) cityId: number,
+  ): Promise<Barbershop[]> {
+    return await this.locationService.findBarbershopsByCity(cityId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.locationService.update(+id);
+  //STATE
+  @Get('states')
+  async findStatesWithBarbershop(): Promise<State[]> {
+    return await this.locationService.findStatesWithBarbershop();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.locationService.remove(+id);
-  }
+  // @Get()
+  // findAll() {
+  //   return this.locationService.findAll();
+  // }
+
+  // @Patch(':id')
+  // update(@Param('id') id: string) {
+  //   return this.locationService.update(+id);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.locationService.remove(+id);
+  // }
 }

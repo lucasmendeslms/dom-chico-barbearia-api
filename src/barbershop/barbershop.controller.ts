@@ -9,24 +9,31 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { BarbershopService } from './barbershop.service';
-import { CreateBarbershopDto } from './dto/create-barbershop.dto';
+import { BarbershopDto } from './dto/barbershop.dto';
 import { Barbershop } from './entities/barbershop.entity';
 // import { FindOneBarbershopDto } from './dto/read-barbershop.dto';
 // import { UpdateBarbershopDto } from './dto/update-barbershop.dto';
 
-@Controller('barbershop')
+@Controller('barbershops')
 export class BarbershopController {
   constructor(private readonly barbershopService: BarbershopService) {}
 
   @Post()
-  create(@Body() body: CreateBarbershopDto): Promise<void> {
+  create(@Body() body: BarbershopDto): Promise<void> {
     return this.barbershopService.create(body);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Barbershop> {
-    return this.barbershopService.findOne(id);
+  findBarbershopById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Barbershop> {
+    return this.barbershopService.findBarbershopById(id);
   }
+
+  // @Get(':id')
+  // findOne(@Param('id', ParseIntPipe) id: number): Promise<Barbershop> {
+  //   return this.barbershopService.findOne(id);
+  // }
 
   // @Get()
   // findAll() {

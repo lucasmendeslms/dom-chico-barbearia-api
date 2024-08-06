@@ -11,6 +11,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - dom_chico_pg_data:/bitnami/postgresql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   dom_chico_pg_data:

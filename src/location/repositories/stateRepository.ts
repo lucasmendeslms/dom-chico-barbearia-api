@@ -5,4 +5,6 @@ export abstract class StateRepository {
   abstract countStates(): Promise<number>;
   abstract getAllStates(): Promise<State[]>;
   abstract createDefaultStates(statesList: State[]): Promise<void>;
+  abstract findStatesWithBarbershop(): Promise<State[]>;
+  abstract findStateById(id: number): Promise<State>;
 }
