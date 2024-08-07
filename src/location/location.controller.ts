@@ -22,7 +22,7 @@ export class LocationController {
 
   //CITY
   @Post('city')
-  createCity(@Body() body: CityDto): Promise<number> {
+  async createCity(@Body() body: CityDto): Promise<number> {
     return this.locationService.createCity(body);
   }
 

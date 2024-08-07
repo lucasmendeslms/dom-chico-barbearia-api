@@ -40,12 +40,15 @@ export class PrismaStateRepository implements StateRepository {
     return this.prisma.state.findMany({
       where: {
         cities: {
-          some: {
-            addresses: {
-              some: {
-                barbershop: {},
-              },
-            },
+          // some: {
+          //   addresses: {
+          //     some: {
+          //       barbershop: {},
+          //     },
+          //   },
+          // },
+          addresses: {
+            barbershop: {},
           },
         },
       },

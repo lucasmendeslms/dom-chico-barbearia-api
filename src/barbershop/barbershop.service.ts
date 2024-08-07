@@ -9,6 +9,9 @@ import { LocationService } from 'src/location/location.service';
 import { BarbershopRepository } from './repositories/barbershopRepository';
 import { BarbershopDto } from './dto/barbershop.dto';
 import { Barbershop } from './entities/barbershop.entity';
+import { BarbershopServices } from './entities/barbershopService';
+import { Barber } from '../barber/entities/barber.entity';
+import { BarberService } from 'src/barber/barber.service';
 
 @Injectable()
 export class BarbershopService {
@@ -16,7 +19,11 @@ export class BarbershopService {
     private barbershopRepository: BarbershopRepository,
     @Inject(forwardRef(() => LocationService))
     private locationService: LocationService,
+    @Inject(forwardRef(() => BarberService))
+    private barberService: BarberService,
   ) {}
+
+  // BARBERSHOP
 
   async create(barbershopData: BarbershopDto): Promise<void> {
     const { name, phone, cnpj, address, adminId } = barbershopData;
@@ -53,6 +60,44 @@ export class BarbershopService {
     }
 
     return barbershops;
+  }
+
+  // SERVICES
+
+  async findAllBarbershopServices(id: number): Promise<BarbershopServices[]> {
+    await this.findBarbershopById(id);
+
+    const barbershopServices: BarbershopServices[] =
+      await this.barbershopRepository.findAllBarbershopServices(id);
+
+    if (!barbershopServices) {
+      throw new NotFoundException(
+        'There are no services available in this barbershop',
+      );
+    }
+
+    return barbershopServices;
+  }
+
+  async findBarbersByService(
+    barbershopId: number,
+    serviceId: number,
+  ): Promise<Barber[]> {
+    return await this.barberService.findBarbersByService(
+      barbershopId,
+      serviceId,
+    );
+  }
+
+  async findBarbershopServiceById(id: number): Promise<BarbershopServices> {
+    const service: BarbershopServices =
+      await this.barbershopRepository.findBarbershopServiceById(id);
+
+    if (!service) {
+      throw new NotFoundException('Service not found');
+    }
+
+    return service;
   }
 
   update(id: number) {

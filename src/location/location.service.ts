@@ -29,6 +29,14 @@ export class LocationService implements OnModuleInit {
     private barbershopService: BarbershopService,
   ) {}
 
+  async onModuleInit(): Promise<void> {
+    const countStates: number = await this.stateRepository.countStates();
+
+    if (countStates < 27) {
+      await this.createDefaultStates();
+    }
+  }
+
   //ADDRESS
 
   async createAddress(addressData: AddressDto): Promise<number> {
@@ -79,14 +87,6 @@ export class LocationService implements OnModuleInit {
   }
 
   //STATE
-
-  async onModuleInit(): Promise<void> {
-    const countStates: number = await this.stateRepository.countStates();
-
-    if (countStates < 27) {
-      await this.createDefaultStates();
-    }
-  }
 
   async createState(stateData: StateDto): Promise<number> {
     const { name, abbreviation } = stateData;

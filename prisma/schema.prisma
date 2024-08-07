@@ -68,7 +68,7 @@ model BarberSchedule {
   breakTimeStart String
   breakTimeEnd   String
   endTime        String
-  barber         Barber   @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
+  barber         Barber   @relation(fields: [barberId], references: [userId], onDelete: Cascade)
 
   @@index([barberId])
   @@index([weekday])
@@ -105,7 +105,7 @@ model BarbershopServices {
 model BarberServices {
   barberId  Int
   serviceId Int
-  barber    Barber             @relation(fields: [barberId], references: [employeeId], onDelete: Cascade)
+  barber    Barber             @relation(fields: [barberId], references: [userId], onDelete: Cascade)
   service   BarbershopServices @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@id([barberId, serviceId])
@@ -117,7 +117,7 @@ model BarbershopAppointments {
   barberId          Int
   barbershopId      Int
   dateTime          DateTime
-  barber            Barber             @relation(fields: [barberId], references: [employeeId])
+  barber            Barber             @relation(fields: [barberId], references: [userId])
   barbershop        Barbershop         @relation(fields: [barbershopId], references: [id])
   customer          Customer           @relation(fields: [customerId], references: [userId])
   scheduledServices ScheduledService[]

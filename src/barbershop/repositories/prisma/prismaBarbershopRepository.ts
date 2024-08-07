@@ -2,6 +2,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { BarbershopRepository } from '../barbershopRepository';
 import { Injectable } from '@nestjs/common';
 import { Barbershop } from 'src/barbershop/entities/barbershop.entity';
+import { BarbershopServices } from 'src/barbershop/entities/barbershopService';
 
 @Injectable()
 export class PrismaBarbershopRepository implements BarbershopRepository {
@@ -29,7 +30,7 @@ export class PrismaBarbershopRepository implements BarbershopRepository {
     });
   }
 
-  findBarbershopsInCity(cityId: number): Promise<Barbershop[]> {
+  async findBarbershopsInCity(cityId: number): Promise<Barbershop[]> {
     return this.prisma.barbershop.findMany({
       where: {
         address: {
@@ -37,6 +38,31 @@ export class PrismaBarbershopRepository implements BarbershopRepository {
             id: cityId,
           },
         },
+      },
+      include: {
+        address: {
+          include: {
+            city: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findAllBarbershopServices(
+    barbershopId: number,
+  ): Promise<BarbershopServices[]> {
+    return this.prisma.barbershopServices.findMany({
+      where: {
+        barbershopId,
+      },
+    });
+  }
+
+  async findBarbershopServiceById(id: number): Promise<BarbershopServices> {
+    return this.prisma.barbershopServices.findUnique({
+      where: {
+        id,
       },
     });
   }
