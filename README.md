@@ -1,6 +1,14 @@
-Github do Front:
+# OBSERVAÇÕES PARA O PROFESSOR:
 
+Github do Front:
 https://github.com/Teixeira00/front-barb-final.git
+
+Infelizmente a integração entre o front-end e o backend não funcionou como esperávamos.
+
+Vou deixar a collection do postman das chamadas do back-end anexadas ao repositório para auxiliarem na avaliação da nota
+
+Tentamos criar outro front-end que realiza integração com o Google, mas ele não funcionou como esperado e tivemos que abandoná-lo, segue o link:
+https://github.com/lucasmendeslms/dom-chico-website
 
 ## Description
 
@@ -58,28 +66,13 @@ $ docker-compose start
   $ npm run start:prod
 ```
 
-## Test
+## Observação:
 
-```bash
-# unit tests
-$ npm run test
+Caso você já rodado o projeto uma vez, para rodá-lo novamente será necessário seguir de inicialização:
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Docker
+- Backend
+- Frontend
 
 ## License
 

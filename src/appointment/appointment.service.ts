@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { AppointmentRepository } from './repositories/appointmentRepository';
 import { AppointmentDto } from './dto/appointment.dto';
 import { BarberService } from 'src/barber/barber.service';
@@ -26,6 +31,10 @@ export class AppointmentService {
       this.barbershopService.findBarbershopById(data.barbershopId),
       this.barbershopService.findBarbershopServiceById(data.serviceId),
     ]);
+
+    await this.appointmentRepository.createAppointment(data);
+
+    throw new BadRequestException('Invalid appointment data');
   }
 }
 

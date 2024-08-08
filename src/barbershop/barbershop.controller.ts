@@ -17,7 +17,7 @@ import { BarbershopServices } from './entities/barbershopService';
 // import { FindOneBarbershopDto } from './dto/read-barbershop.dto';
 // import { UpdateBarbershopDto } from './dto/update-barbershop.dto';
 
-@Controller('barbershop')
+@Controller('barbershops')
 export class BarbershopController {
   constructor(private readonly barbershopService: BarbershopService) {}
 

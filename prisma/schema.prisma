@@ -95,7 +95,7 @@ model BarbershopAppointments {
   customerId        Int
   barberId          Int
   barbershopId      Int
-  dateTime          DateTime
+  dateTime          String
   barber            Barber             @relation(fields: [barberId], references: [userId])
   barbershop        Barbershop         @relation(fields: [barbershopId], references: [id])
   customer          Customer           @relation(fields: [customerId], references: [userId])

@@ -10,6 +10,8 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
   async createAppointment(data: AppointmentDto): Promise<void> {
     const { barberId, barbershopId, customerId, dateTime, serviceId } = data;
 
+    console.log(data);
+
     const appointment = await this.prisma.barbershopAppointments.create({
       data: {
         customerId,
