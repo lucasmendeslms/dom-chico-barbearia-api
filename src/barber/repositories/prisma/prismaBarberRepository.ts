@@ -7,38 +7,38 @@ import { Barber } from 'src/barber/entities/barber.entity';
 export class PrismaBarberRepository implements BarberRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findBarbersByService(
-    barbershopId: number,
-    serviceId: number,
-  ): Promise<Barber[]> {
-    const result = await this.prisma.barber.findMany({
-      where: {
-        barbershopId,
-        servicesProvided: {
-          some: {
-            serviceId,
-          },
-        },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            picture: true,
-          },
-        },
-      },
-    });
+  // async findBarbersByService(
+  //   barbershopId: number,
+  //   serviceId: number,
+  // ): Promise<Barber[]> {
+  //   const result = await this.prisma.barber.findMany({
+  //     where: {
+  //       barbershopId,
+  //       servicesProvided: {
+  //         some: {
+  //           serviceId,
+  //         },
+  //       },
+  //     },
+  //     include: {
+  //       user: {
+  //         select: {
+  //           id: true,
+  //           name: true,
+  //           email: true,
+  //           picture: true,
+  //         },
+  //       },
+  //     },
+  //   });
 
-    const barbers = result.map((result) => {
-      const { user } = result;
-      return user;
-    });
+  //   const barbers = result.map((result) => {
+  //     const { user } = result;
+  //     return user;
+  //   });
 
-    return barbers;
-  }
+  //   return barbers;
+  // }
 
   async findBarberById(id: number): Promise<Barber> {
     const barber = await this.prisma.barber.findUnique({

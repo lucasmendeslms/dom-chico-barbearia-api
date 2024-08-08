@@ -16,22 +16,22 @@ export class BarberService {
     private barbershopService: BarbershopService,
   ) {}
 
-  async findBarbersByService(
-    barbershopId: number,
-    serviceId: number,
-  ): Promise<Barber[]> {
-    await this.barbershopService.findBarbershopById(barbershopId);
-    await this.barbershopService.findBarbershopServiceById(serviceId);
+  // async findBarbersByService(
+  //   barbershopId: number,
+  //   serviceId: number,
+  // ): Promise<Barber[]> {
+  //   await this.barbershopService.findBarbershopById(barbershopId);
+  //   await this.barbershopService.findBarbershopServiceById(serviceId);
 
-    const barbersAvailable: Barber[] =
-      await this.barberRepository.findBarbersByService(barbershopId, serviceId);
+  //   const barbersAvailable: Barber[] =
+  //     await this.barberRepository.findBarbersByService(barbershopId, serviceId);
 
-    if (!barbersAvailable.length) {
-      throw new NotFoundException('There are no barbers available');
-    }
+  //   if (!barbersAvailable.length) {
+  //     throw new NotFoundException('There are no barbers available');
+  //   }
 
-    return barbersAvailable;
-  }
+  //   return barbersAvailable;
+  // }
 
   async findBarberById(id: number): Promise<Barber> {
     const barber: Barber = await this.barberRepository.findBarberById(id);

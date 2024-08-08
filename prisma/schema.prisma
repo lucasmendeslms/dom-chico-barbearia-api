@@ -26,38 +26,27 @@ model User {
 }
 
 model Customer {
-  userId       Int                        @id
-  user         User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           Int                      @id @default(autoincrement())
+  userId       Int                      @unique
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   appointments BarbershopAppointments[]
-  updateLog    ServiceDeliveryStatusLog[]
-}
-
-model Enrollment {
-  id     Int     @id @default(autoincrement())
-  admin  Admin?
-  barber Barber?
 }
 
 model Admin {
-  userId      Int                        @id
-  employeeId  Int                        @unique
-  enrollment  Enrollment                 @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  user        User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int          @id @default(autoincrement())
+  userId      Int          @unique
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   barbershops Barbershop[]
-  updateLog   ServiceDeliveryStatusLog[]
 }
 
 model Barber {
-  userId           Int                        @id
-  employeeId       Int                        @unique
-  barbershopId     Int
-  barbershop       Barbershop                 @relation(fields: [barbershopId], references: [id])
-  enrollment       Enrollment                 @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  user             User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  schedule         BarberSchedule[]
-  servicesProvided BarberServices[]
-  appointments     BarbershopAppointments[]
-  updateLog        ServiceDeliveryStatusLog[]
+  id           Int                      @id @default(autoincrement())
+  userId       Int                      @unique
+  barbershopId Int
+  barbershop   Barbershop               @relation(fields: [barbershopId], references: [id])
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedule     BarberSchedule[]
+  appointments BarbershopAppointments[]
 }
 
 model BarberSchedule {
@@ -98,17 +87,7 @@ model BarbershopServices {
   duration            String
   barbershopId        Int
   barbershop          Barbershop         @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  barbers             BarberServices[]
   appointmentServices ScheduledService[]
-}
-
-model BarberServices {
-  barberId  Int
-  serviceId Int
-  barber    Barber             @relation(fields: [barberId], references: [userId], onDelete: Cascade)
-  service   BarbershopServices @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-
-  @@id([barberId, serviceId])
 }
 
 model BarbershopAppointments {
@@ -137,34 +116,8 @@ model ServiceDelivery {
   id                    Int                    @id @default(autoincrement())
   totalPrice            Decimal
   appointmentId         Int                    @unique
+  status                AppointmentStatus
   barbershopAppointment BarbershopAppointments @relation(fields: [appointmentId], references: [id])
-  status                ServiceDeliveryStatus?
-}
-
-model ServiceDeliveryStatus {
-  id                Int                        @id @default(autoincrement())
-  serviceDeliveryId Int                        @unique
-  note              String
-  appointmentStatus AppointmentStatus
-  paymentStatus     PaymentStatus
-  serviceDelivery   ServiceDelivery            @relation(fields: [serviceDeliveryId], references: [id])
-  log               ServiceDeliveryStatusLog[]
-
-  @@index([serviceDeliveryId])
-}
-
-model ServiceDeliveryStatusLog {
-  id                      Int                   @id @default(autoincrement())
-  serviceDeliveryStatusId Int
-  lastUpdate              DateTime
-  modifiedBy              Int?
-  modifiedByCustomer      Customer?             @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_customer_log")
-  modifiedByBarber        Barber?               @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_barber_log")
-  modifiedByAdmin         Admin?                @relation(fields: [modifiedBy], references: [userId], onDelete: Cascade, map: "fk_modified_by_admin_log")
-  serviceDeliveryStatus   ServiceDeliveryStatus @relation(fields: [serviceDeliveryStatusId], references: [id], onDelete: Cascade)
-
-  @@index([modifiedBy])
-  @@index([serviceDeliveryStatusId])
 }
 
 model BarbershopAddress {
@@ -173,7 +126,7 @@ model BarbershopAddress {
   number       String
   neighborhood String
   zipcode      String
-  cityId       Int         @unique
+  cityId       Int
   city         City        @relation(fields: [cityId], references: [id])
   barbershop   Barbershop?
 
@@ -181,18 +134,18 @@ model BarbershopAddress {
 }
 
 model City {
-  id        Int                @id @default(autoincrement())
+  id        Int                 @id @default(autoincrement())
   name      String
-  stateId   Int                @unique
-  state     State              @relation(fields: [stateId], references: [id])
-  addresses BarbershopAddress?
+  stateId   Int
+  state     State               @relation(fields: [stateId], references: [id])
+  addresses BarbershopAddress[]
 }
 
 model State {
   id           Int    @id @default(autoincrement())
   name         String
   abbreviation String @unique @db.Char(2)
-  cities       City?
+  cities       City[]
 
   @@index([abbreviation])
 }

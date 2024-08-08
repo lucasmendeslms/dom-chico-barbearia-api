@@ -10,7 +10,7 @@ import { BarbershopRepository } from './repositories/barbershopRepository';
 import { BarbershopDto } from './dto/barbershop.dto';
 import { Barbershop } from './entities/barbershop.entity';
 import { BarbershopServices } from './entities/barbershopService';
-import { Barber } from '../barber/entities/barber.entity';
+// import { Barber } from '../barber/entities/barber.entity';
 import { BarberService } from 'src/barber/barber.service';
 
 @Injectable()
@@ -79,15 +79,15 @@ export class BarbershopService {
     return barbershopServices;
   }
 
-  async findBarbersByService(
-    barbershopId: number,
-    serviceId: number,
-  ): Promise<Barber[]> {
-    return await this.barberService.findBarbersByService(
-      barbershopId,
-      serviceId,
-    );
-  }
+  // async findBarbersByService(
+  //   barbershopId: number,
+  //   serviceId: number,
+  // ): Promise<Barber[]> {
+  //   return await this.barberService.findBarbersByService(
+  //     barbershopId,
+  //     serviceId,
+  //   );
+  // }
 
   async findBarbershopServiceById(id: number): Promise<BarbershopServices> {
     const service: BarbershopServices =

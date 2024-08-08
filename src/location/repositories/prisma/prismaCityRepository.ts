@@ -27,12 +27,11 @@ export class PrismaCityRepository implements CityRepository {
       where: {
         stateId,
         addresses: {
-          // some: {
-          //   barbershop: {
-          //     isNot: null,
-          //   },
-          // },
-          barbershop: {},
+          some: {
+            barbershop: {
+              isNot: null,
+            },
+          },
         },
       },
     });

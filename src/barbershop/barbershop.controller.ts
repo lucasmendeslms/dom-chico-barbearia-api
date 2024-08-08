@@ -7,13 +7,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  Query,
+  // Query,
 } from '@nestjs/common';
 import { BarbershopService } from './barbershop.service';
 import { BarbershopDto } from './dto/barbershop.dto';
 import { Barbershop } from './entities/barbershop.entity';
 import { BarbershopServices } from './entities/barbershopService';
-import { Barber } from '../barber/entities/barber.entity';
+// import { Barber } from '../barber/entities/barber.entity';
 // import { FindOneBarbershopDto } from './dto/read-barbershop.dto';
 // import { UpdateBarbershopDto } from './dto/update-barbershop.dto';
 
@@ -22,7 +22,7 @@ export class BarbershopController {
   constructor(private readonly barbershopService: BarbershopService) {}
 
   @Post()
-  async create(@Body() body: BarbershopDto): Promise<void> {
+  create(@Body() body: BarbershopDto): Promise<void> {
     return this.barbershopService.create(body);
   }
 
@@ -40,13 +40,13 @@ export class BarbershopController {
     return this.barbershopService.findAllBarbershopServices(id);
   }
 
-  @Get(':barbershopId/barbers')
-  async findBarbersByService(
-    @Param('barbershopId', ParseIntPipe) barbershopId: number,
-    @Query('service', ParseIntPipe) service: number,
-  ): Promise<Barber[]> {
-    return this.barbershopService.findBarbersByService(barbershopId, service);
-  }
+  // @Get(':barbershopId/barbers')
+  // async findBarbersByService(
+  //   @Param('barbershopId', ParseIntPipe) barbershopId: number,
+  //   @Query('service', ParseIntPipe) service: number,
+  // ): Promise<Barber[]> {
+  //   return this.barbershopService.findBarbersByService(barbershopId, service);
+  // }
 
   @Patch(':id')
   update(

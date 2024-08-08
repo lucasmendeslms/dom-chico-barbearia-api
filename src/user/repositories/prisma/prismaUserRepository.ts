@@ -24,6 +24,19 @@ export class PrismaUserRepository implements UserRepository {
     const user: User = await this.prisma.user.create({
       data: userData,
     });
+
+    if (user.type === 'CUSTOMER') {
+      await this.prisma.customer.create({
+        data: { userId: user.id },
+      });
+    }
+
+    if (user.type === 'ADMIN') {
+      await this.prisma.admin.create({
+        data: { userId: user.id },
+      });
+    }
+
     return user;
   }
 
