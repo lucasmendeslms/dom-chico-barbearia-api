@@ -1,0 +1,281 @@
+{
+	"info": {
+		"_postman_id": "bcd5c952-34a9-4089-ab41-604970173cd5",
+		"name": "dom-chico-barbearia",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19228916"
+	},
+	"item": [
+		{
+			"name": "Barbearia",
+			"item": [
+				{
+					"name": "Criar barbearia",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Barbearia Estilo\",\r\n    \"phone\": \"(11) 91234-5678\",\r\n    \"cnpj\": \"57.212.850/0001-70\",\r\n    \"adminId\": 2585,\r\n    \"address\": {\r\n        \"street\": \"Avenida das Palmeiras\",\r\n        \"neighborhood\": \"Jardim Tropical\",\r\n        \"number\": \"123\",\r\n        \"zipcode\": \"12345-678\",\r\n        \"city\": {\r\n            \"name\": \"São Paulo\",\r\n            \"stateId\": 25\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/api/barbershops",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"barbershops"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar uma barbearia",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/barbershops/13",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"barbershops",
+								"13"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar todos os serviços de uma barbearia",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/barbershops/13/services",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"barbershops",
+								"13",
+								"services"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuario",
+			"item": [
+				{
+					"name": "Buscar um usuário pelo id do google",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/users/google/115690935383614194433",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"users",
+								"google",
+								"115690935383614194433"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar um usuário pelo id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/users/40",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"users",
+								"40"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar usuário",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"googleAccountId\" : \"11569093538361411256454\",\r\n    \"name\": \"Manoel Gomes\",\r\n    \"cpf\": \"640.836.400-11\",\r\n    \"phone\": \"(96) 98408-6234\",\r\n    \"email\": \"manoaelaa@sha.com.br\",\r\n    \"type\": \"ADMIN\",\r\n    \"picture\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Localização (Endereço, cidade, estado)",
+			"item": [
+				{
+					"name": "Buscar estados com barbearias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/states",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"states"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar cidades com barbearias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/states/19/cities",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"states",
+								"19",
+								"cities"
+							],
+							"query": [
+								{
+									"key": "http://localhost:4000/api/states/{stateID}/cities",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar todas as barbearias na cidade",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/cities/57/barbershops",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"cities",
+								"57",
+								"barbershops"
+							],
+							"query": [
+								{
+									"key": "http://localhost:4000/api/cities/{cityId}/barbershops",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Agendamento",
+			"item": [
+				{
+					"name": "Criar um agendamento",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customerId\": 2582,\r\n    \"barbershopId\": 1274,\r\n    \"barberId\": 1644,\r\n    // \"serviceId\": 4569,\r\n    \"dateTime\": \"2023-08-07T14:08:00.000Z\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/api/appointments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
