@@ -1,4 +1,4 @@
-Github do Front
+Github do Front:
 
 https://github.com/Teixeira00/front-barb-final.git
 

@@ -17,12 +17,12 @@ import { BarbershopServices } from './entities/barbershopService';
 // import { FindOneBarbershopDto } from './dto/read-barbershop.dto';
 // import { UpdateBarbershopDto } from './dto/update-barbershop.dto';
 
-@Controller('barbershops')
+@Controller('barbershop')
 export class BarbershopController {
   constructor(private readonly barbershopService: BarbershopService) {}
 
   @Post()
-  create(@Body() body: BarbershopDto): Promise<void> {
+  async create(@Body() body: BarbershopDto): Promise<void> {
     return this.barbershopService.create(body);
   }
 
